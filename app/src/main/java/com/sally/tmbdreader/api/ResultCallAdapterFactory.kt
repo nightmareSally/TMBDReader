@@ -12,12 +12,12 @@ class ResultCallAdapterFactory : CallAdapter.Factory() {
         annotations: Array<out Annotation>,
         retrofit: Retrofit
     ): CallAdapter<*, *>? {
-        if (getRawType(returnType) != Call::class || returnType !is ParameterizedType) {
+        if (getRawType(returnType) != Call::class.java || returnType !is ParameterizedType) {
             return null
         }
         val upperBound = getParameterUpperBound(0, returnType)
 
-        return if (upperBound is ParameterizedType && upperBound.rawType == ApiResult::class) {
+        return if (upperBound is ParameterizedType && upperBound.rawType == ApiResult::class.java) {
             object : CallAdapter<Any, Call<ApiResult<Any>>> {
                 override fun responseType(): Type = getParameterUpperBound(0, upperBound)
 
