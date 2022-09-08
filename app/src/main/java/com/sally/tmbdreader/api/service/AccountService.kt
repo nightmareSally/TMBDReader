@@ -1,19 +1,41 @@
 package com.sally.tmbdreader.api.service
 
 import com.sally.tmbdreader.api.ApiResult
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
-import retrofit2.http.Path
+import com.sally.tmbdreader.model.AccountData
+import com.sally.tmbdreader.model.RequestTokenData
+import com.sally.tmbdreader.model.SessionData
+import retrofit2.http.*
 
 interface AccountService {
 
-    @POST("/account/{account_id}/favorite")
+    @GET("/3/authentication/token/new")
+    suspend fun getRequestToken(): ApiResult<RequestTokenData>
+
+    @POST("/3/authentication/token/validate_with_login")
     @FormUrlEncoded
-    fun setFavorite(
-        @Path("account_id") accountId: String,
-        @Field("media_type") type: String,
-        @Field("media_id") id: Int,
-        @Field("favorite") favorite: Boolean
+    suspend fun login(
+            @Field("username") userName: String,
+            @Field("password") password: String,
+            @Field("request_token") token: String
+    ): ApiResult<RequestTokenData>
+
+    @POST("/3/authentication/session/new")
+    @FormUrlEncoded
+    suspend fun createSession(
+            @Field("request_token") token: String
+    ): ApiResult<SessionData>
+
+    @GET("/3/account")
+    suspend fun getAccountDetail(
+            @Query("session_id") sessionId: String
+    ): ApiResult<AccountData>
+
+    @POST("/3/account/{account_id}/favorite")
+    @FormUrlEncoded
+    suspend fun setFavorite(
+            @Path("account_id") accountId: String,
+            @Field("media_type") type: String,
+            @Field("media_id") id: Int,
+            @Field("favorite") favorite: Boolean
     ): ApiResult<Any>
 }
