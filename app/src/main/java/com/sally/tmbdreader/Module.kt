@@ -11,8 +11,11 @@ import com.sally.tmbdreader.api.service.AccountService
 import com.sally.tmbdreader.api.service.MovieService
 import com.sally.tmbdreader.db.TMBDDatabase
 import com.sally.tmbdreader.repository.AccountRepository
+import com.sally.tmbdreader.repository.MovieRepository
 import com.sally.tmbdreader.util.SharedPreference
 import com.sally.tmbdreader.viewModel.LoginViewModel
+import com.sally.tmbdreader.viewModel.MovieDetailViewModel
+import com.sally.tmbdreader.viewModel.MovieListViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -26,6 +29,8 @@ const val DATABASE_NAME = "TMBD_DATABASE"
 
 val viewModelModule = module {
     viewModel { LoginViewModel(get(), get(), androidApplication()) }
+    viewModel { MovieListViewModel(get(), get(), get(), androidApplication()) }
+    viewModel { MovieDetailViewModel(get(), get(), androidApplication()) }
 }
 
 val apiModule = module {
@@ -35,7 +40,9 @@ val apiModule = module {
 }
 
 val dbModule = module {
-    single { Room.databaseBuilder(androidApplication(), TMBDDatabase::class.java, DATABASE_NAME).build() }
+    single {
+        Room.databaseBuilder(androidApplication(), TMBDDatabase::class.java, DATABASE_NAME).build()
+    }
     single { get<TMBDDatabase>().getMovieDao() }
     single { get<TMBDDatabase>().getFavoriteDao() }
 }
@@ -43,24 +50,28 @@ val dbModule = module {
 val repositoryModule = module {
     single { getSharedPreferences(androidContext()) }
     single { SharedPreference(get()) }
-    single { AccountRepository(get()) }
+    single { AccountRepository(get(), get()) }
+    single { MovieRepository(get(), get()) }
 }
 
 
 fun getRetrofit(): Retrofit {
     val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().setLevel(
-                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-                    else HttpLoggingInterceptor.Level.NONE))
-            .addInterceptor(DefaultQueryInterceptor())
-            .addInterceptor(ApiErrorInterceptor())
-            .build()
+        .addInterceptor(
+            HttpLoggingInterceptor().setLevel(
+                if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                else HttpLoggingInterceptor.Level.NONE
+            )
+        )
+        .addInterceptor(DefaultQueryInterceptor())
+        .addInterceptor(ApiErrorInterceptor())
+        .build()
     return Retrofit.Builder()
-            .baseUrl(BuildConfig.Host_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(ResultCallAdapterFactory())
-            .client(okHttpClient)
-            .build()
+        .baseUrl(BuildConfig.Host_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(ResultCallAdapterFactory())
+        .client(okHttpClient)
+        .build()
 }
 
 fun getSharedPreferences(context: Context): SharedPreferences {

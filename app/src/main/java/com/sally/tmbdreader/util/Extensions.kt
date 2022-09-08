@@ -1,5 +1,6 @@
 package com.sally.tmbdreader.util
 
+import android.content.res.Resources
 import com.sally.tmbdreader.api.ApiResult
 
 object Extensions {
@@ -26,4 +27,6 @@ object Extensions {
             executable(message)
         }
     }
+
+    fun Float.dpToPx() = this * Resources.getSystem().displayMetrics.density
 }

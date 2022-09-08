@@ -1,9 +1,6 @@
 package com.sally.tmbdreader.db.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
+import androidx.room.*
 import com.sally.tmbdreader.db.entity.FavoriteEntity
 
 @Dao
@@ -11,9 +8,15 @@ interface FavoriteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(favorite: FavoriteEntity)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(favorites: List<FavoriteEntity>)
+
+    @Query("SELECT COUNT(*) FROM favorite WHERE movie_id = :id")
+    fun getFavoriteCount(id: Int): Int
 
     @Delete
     fun delete(favorite: FavoriteEntity)
+
+    @Query("DELETE FROM favorite")
+    fun deleteAll()
 }

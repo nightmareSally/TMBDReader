@@ -27,7 +27,7 @@ class LoginActivity : BaseActivity() {
         }
 
         mViewModel.onLoginSuccess.observe(this) {
-            Toast.makeText(this, "account: $it", Toast.LENGTH_SHORT).show()
+            startActivity(MovieListActivity.getIntent(this))
         }
     }
 }

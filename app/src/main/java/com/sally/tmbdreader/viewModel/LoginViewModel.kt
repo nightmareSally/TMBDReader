@@ -17,7 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LoginViewModel(private val sharedPreference: SharedPreference, private val repository: AccountRepository, application: Application) : BaseViewModel(application) {
+class LoginViewModel(
+    private val sharedPreference: SharedPreference,
+    private val repository: AccountRepository,
+    application: Application
+) : BaseViewModel(application) {
 
     val userName: LiveData<String>
         get() = _userName
@@ -27,9 +31,9 @@ class LoginViewModel(private val sharedPreference: SharedPreference, private val
         get() = _password
     private val _password = MutableLiveData<String>()
 
-    val onLoginSuccess: LiveData<String>
+    val onLoginSuccess: LiveData<Unit>
         get() = _onLoginSuccess
-    private val _onLoginSuccess = SingleLiveEvent<String>()
+    private val _onLoginSuccess = SingleLiveEvent<Unit>()
 
     fun setUserName(userName: String) {
         _userName.value = userName
@@ -63,36 +67,59 @@ class LoginViewModel(private val sharedPreference: SharedPreference, private val
 
     private suspend fun loginWithUserData(userName: String, password: String, token: String) {
         repository.login(userName, password, token)
-                .onSuccess {
-                    createSession(it.token)
-                }.onApiError { code, message ->
-                    apiError.postValue(Pair(code, message))
-                }.onNetworkError { message ->
-                    networkError.postValue(message)
-                }
+            .onSuccess {
+                createSession(it.token)
+            }.onApiError { code, message ->
+                apiError.postValue(Pair(code, message))
+            }.onNetworkError { message ->
+                networkError.postValue(message)
+            }
     }
 
     private suspend fun createSession(token: String) {
         repository.createSession(token)
-                .onSuccess {
-                    getAccountData(it.sessionId)
-                }.onApiError { code, message ->
-                    apiError.postValue(Pair(code, message))
-                }.onNetworkError { message ->
-                    networkError.postValue(message)
-                }
+            .onSuccess {
+                getAccountData(it.sessionId)
+            }.onApiError { code, message ->
+                apiError.postValue(Pair(code, message))
+            }.onNetworkError { message ->
+                networkError.postValue(message)
+            }
     }
 
     private suspend fun getAccountData(sessionId: String) {
         repository.getAccountDetail(sessionId)
-                .onSuccess {
-                    sharedPreference.sessionId = sessionId
-                    sharedPreference.accountId = it.id
-                    _onLoginSuccess.postValue(it.userName)
-                }.onApiError { code, message ->
-                    apiError.postValue(Pair(code, message))
-                }.onNetworkError { message ->
-                    networkError.postValue(message)
+            .onSuccess {
+                sharedPreference.sessionId = sessionId
+                sharedPreference.accountId = it.id
+                getFavoriteMovies(it.id, sessionId)
+            }.onApiError { code, message ->
+                apiError.postValue(Pair(code, message))
+            }.onNetworkError { message ->
+                networkError.postValue(message)
+            }
+    }
+
+    private suspend fun getFavoriteMovies(accountId: Int, sessionId: String, page: Int = 1) {
+        repository.getFavoriteMovies(accountId, sessionId, page)
+            .onSuccess {
+                if (it.totalPage != 0 && it.page != it.totalPage) {
+                    getFavoriteMovies(accountId, sessionId, it.page)
+                } else {
+                    _onLoginSuccess.postValue(Unit)
                 }
+            }.onApiError { code, message ->
+                clearData()
+                apiError.postValue(Pair(code, message))
+            }.onNetworkError { message ->
+                clearData()
+                networkError.postValue(message)
+            }
+    }
+
+    suspend fun clearData() {
+        sharedPreference.accountId = null
+        sharedPreference.sessionId = null
+        repository.clearFavorite()
     }
 }
