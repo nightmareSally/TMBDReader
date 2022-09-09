@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import com.bumptech.glide.Glide
+import com.sally.tmbdreader.BuildConfig
 import com.sally.tmbdreader.R
 import com.sally.tmbdreader.databinding.ActivityMovieDetailBinding
 import com.sally.tmbdreader.viewModel.MovieDetailViewModel
@@ -28,5 +31,17 @@ class MovieDetailActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail)
+        mBinding.lifecycleOwner = this
+        mBinding.viewModel = mViewModel
+        val placeholder = CircularProgressDrawable(this)
+        placeholder.start()
+
+
+        mViewModel.movie.observe(this) {
+            Glide.with(mBinding.root)
+                .load(BuildConfig.Image_URL + it.movieInfo.imageUrl)
+                .placeholder(placeholder)
+                .into(mBinding.ivPoster)
+        }
     }
 }

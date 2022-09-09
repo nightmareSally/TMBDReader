@@ -40,7 +40,7 @@
             android:layout_height="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:src="@{movie.favorite? @drawable/favorite : @drawable/not_favorite}" />
+            android:src="@{movie.favorite? @drawable/ic_favorite : @drawable/ic_not_favorite}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

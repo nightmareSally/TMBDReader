@@ -5,7 +5,7 @@ import com.sally.tmbdreader.db.entity.MovieWithFavorite
 
 class DiffCallback: DiffUtil.ItemCallback<MovieWithFavorite>() {
     override fun areItemsTheSame(oldItem: MovieWithFavorite, newItem: MovieWithFavorite): Boolean {
-        return oldItem.movieInfo.id == newItem.movieInfo.id
+        return oldItem.movieInfo.movieId == newItem.movieInfo.movieId
     }
 
     override fun areContentsTheSame(oldItem: MovieWithFavorite, newItem: MovieWithFavorite): Boolean {

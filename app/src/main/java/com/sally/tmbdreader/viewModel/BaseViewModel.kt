@@ -9,4 +9,5 @@ open class BaseViewModel(application: Application): AndroidViewModel(application
     val loading = MutableLiveData<Boolean>()
     val apiError = MutableLiveData<Pair<Int, String?>>()
     val networkError = MutableLiveData<String>()
+
 }

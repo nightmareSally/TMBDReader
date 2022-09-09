@@ -25,7 +25,7 @@ class MovieListAdapter(
     override fun onBindViewHolder(holder: MovieListViewHolder, position: Int) {
         holder.onBind(getItem(position))
         holder.itemView.setOnClickListener {
-            onViewClicked.invoke(getItem(position).movieInfo.id)
+            onViewClicked.invoke(getItem(position).movieInfo.movieId)
         }
     }
 
@@ -37,7 +37,7 @@ class MovieListAdapter(
         fun onBind(movie: MovieWithFavorite) {
             binding.movie = movie
             binding.ivFavorite.setOnClickListener {
-                viewModel.setFavorite(movie.movieInfo.id)
+                viewModel.setFavorite(movie.movieInfo.movieId)
             }
             binding.executePendingBindings()
 

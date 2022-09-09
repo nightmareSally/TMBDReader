@@ -22,7 +22,7 @@ class AccountRepository(private val service: AccountService, private val dao: Fa
         return service.getFavoriteMovies(accountId, sessionId, page)
             .onSuccess { movieData ->
                 movieData.results?.let { movies ->
-                    dao.insertAll(movies.map { FavoriteEntity(it.id) })
+                    dao.insertAll(movies.map { FavoriteEntity(it.movieId) })
                 }
             }
     }
@@ -33,7 +33,7 @@ class AccountRepository(private val service: AccountService, private val dao: Fa
         id: Int,
         favorite: Boolean
     ): ApiResult<Any> {
-        return service.setFavorite(accountId, sessionId,"movie", id, favorite)
+        return service.setFavorite(accountId, sessionId, "movie", id, favorite)
             .onSuccess {
                 if (favorite) {
                     dao.insert(FavoriteEntity(id))
@@ -47,7 +47,7 @@ class AccountRepository(private val service: AccountService, private val dao: Fa
         return dao.getFavoriteCount(id) != 0
     }
 
-    fun clearFavorite() {
+    suspend fun clearFavorite() {
         dao.deleteAll()
     }
 }

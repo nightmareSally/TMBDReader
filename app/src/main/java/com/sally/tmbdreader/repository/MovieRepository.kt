@@ -25,4 +25,6 @@ class MovieRepository(private val service: MovieService, private val dao: MovieD
     }
 
     fun getMovieWithFavorite(id: Int) = dao.getMovieWithFavorite(id)
+
+    suspend fun deleteMovies() = dao.deleteAll()
 }

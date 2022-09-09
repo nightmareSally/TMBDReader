@@ -35,6 +35,20 @@ class LoginViewModel(
         get() = _onLoginSuccess
     private val _onLoginSuccess = SingleLiveEvent<Unit>()
 
+    init {
+        if (sharedPreference.sessionId != null && sharedPreference.accountId != null) {
+            val sessionId = sharedPreference.sessionId!!
+            val accountId = sharedPreference.accountId!!
+            viewModelScope.launch {
+                loading.value = true
+                withContext(Dispatchers.IO) {
+                    getFavoriteMovies(accountId, sessionId)
+                }
+                loading.value = false
+            }
+        }
+    }
+
     fun setUserName(userName: String) {
         _userName.value = userName
     }
@@ -44,8 +58,8 @@ class LoginViewModel(
     }
 
     fun login() {
-        val userName = userName.value ?: return
-        val password = password.value ?: return
+        val userName = if (!userName.value.isNullOrEmpty()) userName.value!! else return
+        val password = if (!password.value.isNullOrEmpty()) password.value!! else return
         viewModelScope.launch {
             loading.value = true
             withContext(Dispatchers.IO) {
@@ -117,7 +131,7 @@ class LoginViewModel(
             }
     }
 
-    suspend fun clearData() {
+    private suspend fun clearData() {
         sharedPreference.accountId = null
         sharedPreference.sessionId = null
         repository.clearFavorite()

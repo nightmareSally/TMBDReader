@@ -30,7 +30,7 @@ const val DATABASE_NAME = "TMBD_DATABASE"
 val viewModelModule = module {
     viewModel { LoginViewModel(get(), get(), androidApplication()) }
     viewModel { MovieListViewModel(get(), get(), get(), androidApplication()) }
-    viewModel { MovieDetailViewModel(get(), get(), androidApplication()) }
+    viewModel { MovieDetailViewModel(get(), get(), get(), get(), androidApplication()) }
 }
 
 val apiModule = module {

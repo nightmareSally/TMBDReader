@@ -18,5 +18,5 @@ interface FavoriteDao {
     fun delete(favorite: FavoriteEntity)
 
     @Query("DELETE FROM favorite")
-    fun deleteAll()
+    suspend fun deleteAll()
 }
