@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">TMBDReader</string>
+    <string name="loading">讀取中...</string>
+    <string name="error_network">網路似乎出了點問題，錯誤說明:%s</string>
+    <string name="error_api">錯誤代碼:%d,\n錯誤說明:%s</string>
+    <string name="i_know">我知道了</string>
+    <string name="user_name">使用者名稱</string>
+    <string name="password">密碼</string>
+    <string name="login">登入</string>
+    <string name="remember_me">記住我</string>
+    <string name="logout">登出</string>
 </resources>

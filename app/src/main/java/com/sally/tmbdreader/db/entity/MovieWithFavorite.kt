@@ -1,9 +1,10 @@
 package com.sally.tmbdreader.db.entity
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 
 data class MovieWithFavorite(
-        @ColumnInfo(name = "movie_info")
+        @Embedded
         val movieInfo: MovieEntity,
         @ColumnInfo(name = "is_favorite")
         val isFavorite: Boolean

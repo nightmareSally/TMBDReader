@@ -10,15 +10,18 @@ interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(movie: MovieEntity)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(movies: List<MovieEntity>)
 
-    @Query("SELECT *, EXISTS(SELECT * FROM movie WHERE id == favorite.movie_id) FROM movie LEFT JOIN favorite on movie.id ==  favorite.movie_id")
+    @Query("SELECT movie.*, EXISTS(SELECT * FROM movie WHERE movie.movie_id == favorite.movie_id) AS is_favorite FROM movie LEFT JOIN favorite on movie.movie_id ==  favorite.movie_id")
     fun getMoviesWithFavorite(): LiveData<List<MovieWithFavorite>>
+
+    @Query("SELECT movie.*, EXISTS(SELECT * FROM movie WHERE movie.movie_id == favorite.movie_id) AS is_favorite FROM movie LEFT JOIN favorite on movie.movie_id ==  favorite.movie_id WHERE movie.movie_id = :id")
+    fun getMovieWithFavorite(id: Int): LiveData<MovieWithFavorite>
 
     @Delete
     fun delete(movie: MovieEntity)
 
     @Query("DELETE FROM movie")
-    fun deleteAll()
+    suspend fun deleteAll()
 }

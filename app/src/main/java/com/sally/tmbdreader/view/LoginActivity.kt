@@ -1,17 +1,26 @@
 package com.sally.tmbdreader.view
 
+import android.app.Dialog
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import com.sally.tmbdreader.R
 import com.sally.tmbdreader.databinding.ActivityLoginBinding
+import com.sally.tmbdreader.databinding.DialogLoadingBinding
 import com.sally.tmbdreader.viewModel.LoginViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginActivity : BaseActivity() {
+
+    companion object {
+        fun getIntent(context: Context) = Intent(context, LoginActivity::class.java)
+    }
+
     private lateinit var mBinding: ActivityLoginBinding
     private val mViewModel: LoginViewModel by viewModel()
+    private var loadingDialog: Dialog? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_login)
@@ -27,7 +36,25 @@ class LoginActivity : BaseActivity() {
         }
 
         mViewModel.onLoginSuccess.observe(this) {
-            Toast.makeText(this, "account: $it", Toast.LENGTH_SHORT).show()
+            startActivity(MovieListActivity.getIntent(this))
+            finish()
+        }
+
+        mViewModel.loading.observe(this) {
+            if (it) {
+                if (loadingDialog?.isShowing == true) {
+                    return@observe
+                }
+                val binding = DialogLoadingBinding.inflate(layoutInflater, null, false)
+                loadingDialog = AlertDialog.Builder(this)
+                    .setView(binding.root)
+                    .setCancelable(false)
+                    .create()
+                loadingDialog?.show()
+                loadingDialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            } else {
+                loadingDialog?.dismiss()
+            }
         }
     }
 }
